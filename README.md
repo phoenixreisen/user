@@ -5,7 +5,7 @@ User Handler, der den typischen Umgang mit einem eingeloggten bzw. sich einlogge
 ## Installation
 
 ```bash
-npm install --save-dev @phoenixreisen/user-handler
+npm install --save @phoenixreisen/user
 ```
 
 ## Test

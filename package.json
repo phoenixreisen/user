@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/phoenixreisen/component-user-handler.git"
+    "url": "https://github.com/phoenixreisen/user.git"
   },
   "author": "Phoenix Reisen <it@phoenixreisen.com>",
   "contributors": [
     "Fabian Marcus <f.marcus@phoenixreisen.com>"
   ],
   "license": "ISC",
-  "homepage": "https://bitbucket.org/phoenixreisen/component-user-handler#readme",
+  "homepage": "https://github.com/phoenixreisen/user#readme",
   "dependencies": {
     "jwt-decode": "^2.2.0",
     "store": "^2.0.12"
