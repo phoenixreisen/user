@@ -1,0 +1,28 @@
+{
+  "name": "@phoenixreisen/user-handler",
+  "version": "3.0.0",
+  "description": "Speichert und lädt Userinformationen im bzw. vom LocalStorage.",
+  "main": "src/user.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/phoenixreisen/component-user-handler.git"
+  },
+  "author": "Phoenix Reisen <it@phoenixreisen.com>",
+  "contributors": [
+    "Fabian Marcus <f.marcus@phoenixreisen.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/phoenixreisen/component-user-handler#readme",
+  "dependencies": {
+    "jwt-decode": "^2.2.0",
+    "store": "^2.0.12"
+  },
+  "devDependencies": {
+    "jasmine": "^3.4.0",
+    "jasmine-local-storage": "^1.1.1",
+    "jsonwebtoken": "^8.5.1"
+  }
+}

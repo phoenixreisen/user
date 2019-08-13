@@ -1,0 +1,1 @@
+require('jasmine-local-storage');
