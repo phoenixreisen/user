@@ -1,7 +1,7 @@
 {
-  "name": "@phoenixreisen/user-handler",
-  "version": "3.0.0",
-  "description": "Speichert und lädt Userinformationen im bzw. vom LocalStorage.",
+  "name": "@phoenixreisen/user",
+  "version": "0.0.1",
+  "description": "User Handler, der den typischen Umgang mit einem eingeloggten bzw. sich einloggenden Phoenix-User erleichtert.",
   "main": "src/user.js",
   "scripts": {
     "test": "jasmine"
