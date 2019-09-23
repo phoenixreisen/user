@@ -1,5 +1,5 @@
 const decode = require('jwt-decode');
-const Store = require('store');
+const Stores = require('./stores');
 
 /**
  * Standardkonfig
@@ -10,7 +10,45 @@ const localConfig = {
         user: 'phx-user',
         jwt: 'phx-user-jwt',
     },
+    sessionOnly: false,
 };
+
+/**
+ * User Model
+ * @public
+ */
+const User = {
+    jwt: undefined,
+    online: null,
+    data: null,
+    
+    getType,
+    setJWTKey,
+    setUserKey,
+    load,
+    login,
+    logout,
+    persist,
+    isPhx,
+    isAdmin,
+    isAgency,
+    isLoggedIn,
+    isServiceProvider,
+    isPasswordAuthenticated,
+}
+module.exports = User;
+
+// FUNKTIONEN ------------------------------------------
+
+/**
+ * @return {Store}
+ * @private
+ */
+function getStore(sessionOnly) {
+    return (sessionOnly || (typeof sessionOnly === 'undefined' && localConfig.sessionOnly))
+        ? Stores.Session
+        : Stores.Browser;
+}
 
 /**
  * Setzt den Schlüsselnamen, unter dem das JWT
@@ -39,13 +77,10 @@ function setUserKey(key) {
  * @return {void}
  * @public
 */
-function persist() {
-    if(User.jwt) {
-        Store.set(localConfig.keys.jwt, User.jwt);
-    }
-    if(User.data) {
-        Store.set(localConfig.keys.user, User.data);
-    }
+function persist(sessionOnly = localConfig.sessionOnly) {
+    const Store = getStore(sessionOnly);
+    User.jwt && Store.set(localConfig.keys.jwt, User.jwt);
+    User.data && Store.set(localConfig.keys.user, User.data);
 }
 
 /**
@@ -55,17 +90,15 @@ function persist() {
  * @public
  */
 function load() {
-    // Wichtig für Offline-Erkennung
+    const { Session } = Stores;
+    const { jwt, user } = localConfig.keys;
+
     User.online = navigator.onLine;
-
-    // Local Storage checken
-    User.jwt = Store.get(localConfig.keys.jwt) || User.jwt;
-    User.data = Store.get(localConfig.keys.user) || User.data;
-    if(User.jwt) return; // Wir haben einen User!
-
-    // User ist nicht eingeloggt
-    User.jwt = undefined;
-    User.data = null;
+    localConfig.sessionOnly = (Session.get(jwt) !== null);
+    
+    const Store = getStore();
+    User.jwt = Store.get(jwt) || User.jwt;
+    User.data = Store.get(user) || User.data;
 }
 
 /**
@@ -178,12 +211,13 @@ function getType() {
  * @return {void}
  * @public
  */
-function login(jwt, data) {
+function login(jwt, data, sessionOnly = false) {
     if(!jwt) {
         throw 'Ohne JWT kein Login!';
     }
-    User.jwt = jwt;
+    localConfig.sessionOnly = !!sessionOnly;
     User.data = data;
+    User.jwt = jwt;
     User.persist();
 }
 
@@ -194,31 +228,10 @@ function login(jwt, data) {
  * @public
  */
 function logout() {
-    User.jwt = undefined;
     User.data = null;
+    User.jwt = undefined;
+    
+    const Store = getStore();
     Store.remove(localConfig.keys.jwt);
     Store.remove(localConfig.keys.user);
 }
-
-
-const User = {
-    jwt: undefined,
-    data: null,
-    online: null,
-
-    getType,
-    setJWTKey,
-    setUserKey,
-    load,
-    persist,
-    login,
-    logout,
-    isPhx,
-    isAdmin,
-    isAgency,
-    isLoggedIn,
-    isServiceProvider,
-    isPasswordAuthenticated,
-}
-
-module.exports = User;
