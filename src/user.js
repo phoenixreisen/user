@@ -94,11 +94,11 @@ function load() {
     const { jwt, user } = localConfig.keys;
 
     User.online = navigator.onLine;
-    localConfig.sessionOnly = (Session.get(jwt) !== null);
+    localConfig.sessionOnly = (Session.get(jwt, null) !== null);
     
     const Store = getStore();
-    User.jwt = Store.get(jwt) || User.jwt;
-    User.data = Store.get(user) || User.data;
+    User.jwt = Store.get(jwt, null) || User.jwt;
+    User.data = Store.get(user, null) || User.data;
 }
 
 /**
