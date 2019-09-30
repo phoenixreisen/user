@@ -19,7 +19,7 @@ const localConfig = {
  */
 const User = {
     jwt: undefined,
-    online: null,
+    online: true,
     data: null,
     
     getType,
