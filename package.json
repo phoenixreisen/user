@@ -15,7 +15,7 @@
     "Fabian Marcus <f.marcus@phoenixreisen.com>"
   ],
   "license": "ISC",
-  "homepage": "https://design-system.phoenixreisen.com",
+  "homepage": "https://design-system.phoenixreisen.net",
   "dependencies": {
     "jwt-decode": "^2.2.0",
     "store": "^2.0.12"
