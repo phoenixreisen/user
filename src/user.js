@@ -108,9 +108,11 @@ function load() {
  */
 function isLoggedIn() {
     if(User.jwt) {
-        const now = new Date();
-        const exp = new Date(parseInt(decode(User.jwt).exp));
-        return (exp >= now);
+        try {
+            const now = new Date();
+            const exp = new Date(parseInt(decode(User.jwt).exp));
+            return (exp >= now);
+        } catch(e) {}
     }
     return false;
 }
@@ -212,13 +214,15 @@ function getType() {
  * @public
  */
 function login(jwt, data, sessionOnly = false) {
-    if(!jwt) {
-        throw 'Ohne JWT kein Login!';
+    try {
+        decode(jwt); // Prüfung, ob valides JWT
+        localConfig.sessionOnly = !!sessionOnly;
+        User.data = data;
+        User.jwt = jwt;
+        User.persist();
+    } catch(e) {
+        throw 'ungültiges JWT!';
     }
-    localConfig.sessionOnly = !!sessionOnly;
-    User.data = data;
-    User.jwt = jwt;
-    User.persist();
 }
 
 /**
