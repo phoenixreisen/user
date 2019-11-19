@@ -37,7 +37,6 @@ const User = {
     isServiceProvider,
     isPasswordAuthenticated,
 }
-module.exports = User;
 
 //--- FUNKTIONEN -----
 
@@ -250,3 +249,7 @@ function logout() {
     Store.remove(localConfig.keys.jwt);
     Store.remove(localConfig.keys.user);
 }
+
+//--- EXPORT -----
+
+module.exports = User;
