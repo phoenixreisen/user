@@ -7,8 +7,8 @@ const Stores = require('./stores');
  */
 const localConfig = {
     keys: {
-        user: 'phx-user',
-        jwt: 'phx-user-jwt',
+        jwt: 'jwt',
+        user: 'user',
     },
     sessionOnly: false,
 };
@@ -21,7 +21,7 @@ const User = {
     jwt: undefined,
     online: true,
     data: null,
-    
+
     getType,
     setJWTKey,
     setUserKey,
@@ -84,7 +84,7 @@ function persist(sessionOnly = localConfig.sessionOnly) {
 }
 
 /**
- * Lädt Benutzer und JWt aus dem Storage. Wird kein User gefunden, 
+ * Lädt Benutzer und JWt aus dem Storage. Wird kein User gefunden,
  * werden Standardwerte gesetzt.
  * @return {void}
  * @public
@@ -95,7 +95,7 @@ function load() {
 
     User.online = navigator.onLine;
     localConfig.sessionOnly = (Session.get(jwt, null) !== null);
-    
+
     const Store = getStore();
     User.jwt = Store.get(jwt, null) || User.jwt;
     User.data = Store.get(user, null) || User.data;
@@ -115,9 +115,9 @@ function isLoggedIn() {
     return false;
 }
 
-/** 
- * Prüfen, ob sich der User bereits mit seinem Passwort 
- * authentifiziert hat. Das JWT enthält dann einen 
+/**
+ * Prüfen, ob sich der User bereits mit seinem Passwort
+ * authentifiziert hat. Das JWT enthält dann einen
  * entsprechenden Eintrag.
  * @return {bool}
  * @public
@@ -131,9 +131,9 @@ function isPasswordAuthenticated() {
 }
 
 /**
- * Prüft anhand einer Rollenangabe im JWT, 
+ * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Phoenix-Mitarbeiter handelt.
- * @return {bool} 
+ * @return {bool}
  * @public
  */
 function isPhx() {
@@ -147,7 +147,7 @@ function isPhx() {
 /**
  * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Phoenix-Admin handelt.
- * @return {bool} 
+ * @return {bool}
  * @public
  */
 function isAdmin() {
@@ -172,7 +172,7 @@ function isAgency() {
 };
 
 /**
- * Prüft anhand einer Rollenangabe im JWT, 
+ * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Dienstleister an Bord handelt.
  * @return {bool}
  * @public
@@ -181,18 +181,18 @@ function isServiceProvider() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.anbieter
-            && data.roles 
+            && data.roles
             && data.roles.includes('phoenixbordpersonal');
     }
     return false;
 };
 
 /**
- * Gibt den Nutzertyp zurück, 
+ * Gibt den Nutzertyp zurück,
  * der im JWT steht (Eigenschaft "kind")
  * @param {object} User
  * @returns {string} kind
- * @public 
+ * @public
  */
 function getType() {
     if(User.jwt) {
@@ -230,7 +230,7 @@ function login(jwt, data, sessionOnly = false) {
 function logout() {
     User.data = null;
     User.jwt = undefined;
-    
+
     const Store = getStore();
     Store.remove(localConfig.keys.jwt);
     Store.remove(localConfig.keys.user);
