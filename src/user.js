@@ -23,6 +23,7 @@ const User = {
     data: null,
 
     getType,
+    getPhxUsername,
     setJWTKey,
     setUserKey,
     load,
@@ -38,7 +39,7 @@ const User = {
 }
 module.exports = User;
 
-// FUNKTIONEN ------------------------------------------
+//--- FUNKTIONEN -----
 
 /**
  * @return {Store}
@@ -192,14 +193,24 @@ function isServiceProvider() {
 /**
  * Gibt den Nutzertyp zurück,
  * der im JWT steht (Eigenschaft "kind")
- * @param {object} User
  * @returns {string} kind
  * @public
  */
 function getType() {
     if(User.jwt) {
-        const data = decode(User.jwt);
-        return data.kind;
+        return decode(User.jwt).kind || null;
+    }
+    return null;
+}
+
+/**
+ * Holt die Benutzerkennung des MAs aus dem JWT,
+ * falls es sich um einen PHX-MA handelt.
+ * @returns {string}s
+ */
+function getPhxUsername() {
+    if(User.jwt && isPhx()) {
+        return decode(User.jwt).sub || null;
     }
     return null;
 }
