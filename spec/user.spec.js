@@ -1,13 +1,13 @@
 /**
  * Tests für Phoenix User.
- * 
- * Hinweis: tatsächlich wird in der Node-Test-Umgebung weder mit sessionStorage noch 
- * localStorage gearbeitet, sondern einfach mit einem memoryStorage, den sich "Browser" 
- * & "Session" quasi teilen. Deshalb müssen wir an manchen Stellen einen Storage stubben, 
+ *
+ * Hinweis: tatsächlich wird in der Node-Test-Umgebung weder mit sessionStorage noch
+ * localStorage gearbeitet, sondern einfach mit einem memoryStorage, den sich "Browser"
+ * & "Session" quasi teilen. Deshalb müssen wir an manchen Stellen einen Storage stubben,
  * um so zu tun, als gäbe es ihn nicht.
  */
-const Stores = require('../src/stores');
-const User = require('../src/user');
+const Stores = require('../dist/stores').default;
+const User = require('../dist/user').default;
 const jwt = require('jsonwebtoken');
 
 global.navigator = { onLine: true };
@@ -26,7 +26,7 @@ describe("User Handler", () => {
         spyOn(Browser, 'get').and.callThrough();
         spyOn(Browser, 'remove').and.callThrough();
 
-        // Da wir hier nur mit localStorage arbeiten wollen, stubben 
+        // Da wir hier nur mit localStorage arbeiten wollen, stubben
         // wir den sessionStorage weg, indem er immer null zurück gibt.
         spyOn(Session, 'get').and.returnValue(null);
 
@@ -52,13 +52,13 @@ describe("User Handler", () => {
         const { Browser } = Stores;
         expect(User.data).toBeNull();
         expect(User.jwt).toBeUndefined();
-        
+
         // Fixe Mockdaten zum arbeiten
         User.login(token, { prename: 'Fabian', surname: 'Marcus' }, false);
         expect(Browser.set).toHaveBeenCalledTimes(2);
         expect(User.data.prename).toBe('Fabian');
         expect(User.data.surname).toBe('Marcus');
-        
+
         // Im gemockten LocalStorage speichern
         User.persist();
         expect(Browser.set).toHaveBeenCalledTimes(4);
@@ -70,23 +70,23 @@ describe("User Handler", () => {
         // Daten aus Storage auslesen
         User.load();
         expect(Browser.get).toHaveBeenCalledTimes(2);
-        
+
         // Prüfen, ob User das enthält, was wir erwarten
         expect(User.data.prename).toBe('Fabian');
         expect(User.data.surname).toBe('Marcus');
-        
+
         // Login-Check: Das Token läuft erst in einer Stunde aus.
         // Die Prüfung sollte also truthy ausgehen.
         const isLoggedIn = User.isLoggedIn();
         expect(isLoggedIn).toBeTruthy();
 
-        // Passwort-Check: Prüft, ob der User sein Passwort bereits 
-        // eingegeben hat. JWT enthält dann entsprechenden Eintrag. 
+        // Passwort-Check: Prüft, ob der User sein Passwort bereits
+        // eingegeben hat. JWT enthält dann entsprechenden Eintrag.
         // Sollte truthy sein.
         const isPasswordAuthenticated = User.isPasswordAuthenticated();
         expect(isPasswordAuthenticated).toBeTruthy();
 
-        // Logout => User sollte danach nicht 
+        // Logout => User sollte danach nicht
         // mehr im Storage zu finden sein.
         User.logout();
         expect(Browser.remove).toHaveBeenCalledTimes(2);
@@ -104,7 +104,7 @@ describe("User Handler", () => {
         User.jwt = jwt.sign({ roles: ['phoenixmitarbeiter','phoenixadmin'] }, 'shhhhh');
         expect(User.isPhx()).toBeTruthy();
         expect(User.isAdmin()).toBeTruthy();
-        
+
         User.jwt = jwt.sign({ roles: ['keinmitarbeiter','keinadmin'] }, 'shhhhh');
         expect(User.isPhx()).toBeFalsy();
         expect(User.isAdmin()).toBeFalsy();
@@ -134,12 +134,12 @@ describe("Storage", () => {
     it('should be able to set a "session only" flag', () => {
         const { Session, Browser } = Stores;
 
-        // User sollte im sessionStorage (true flag), 
+        // User sollte im sessionStorage (true flag),
         // nicht localStorage gespeichert werden.
         User.login(token, { prename: 'Fabian', surname: 'Marcus' }, true);
         expect(Session.set).toHaveBeenCalledTimes(2);
         expect(Browser.set).toHaveBeenCalledTimes(0);
-        // User sollte aus sessionStorage, 
+        // User sollte aus sessionStorage,
         // nicht aus localStorage kommen.
         User.load();
         expect(Session.get).toHaveBeenCalledTimes(3);

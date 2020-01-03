@@ -1,29 +1,36 @@
-const engine = require('store/src/store-engine');
+import engine from 'store/src/store-engine';
+
+import localStorage from 'store/storages/localStorage';
+import cookieStorage from 'store/storages/cookieStorage';
+import sessionStorage from 'store/storages/sessionStorage';
+import memoryStorage from 'store/storages/memoryStorage';
+
+import defaults from 'store/plugins/defaults';
+import expire from 'store/plugins/expire';
+import update from 'store/plugins/update';
 
 const persistent = [
-	require('store/storages/localStorage'),
-	require('store/storages/cookieStorage'),
-	require('store/storages/sessionStorage'),
-	require('store/storages/memoryStorage'),
+	localStorage,
+	cookieStorage,
+	sessionStorage,
+	memoryStorage
 ];
 
 const session = [
-	require('store/storages/sessionStorage'),
-	require('store/storages/memoryStorage'),
+	sessionStorage,
+	memoryStorage,
 ];
 
 const plugins = [
-    require('store/plugins/defaults'),
-    require('store/plugins/expire'),
-	require('store/plugins/update'),
+	defaults,
+	expire,
+	update
 ];
 
-const Session = engine.createStore(session, plugins);
-const Browser = engine.createStore(persistent, plugins);
+export const Session = engine.createStore(session, plugins);
+export const Browser = engine.createStore(persistent, plugins);
 
-if(typeof module !== 'undefined') {
-	module.exports = { 
-		Session, 
-		Browser 
-	};
+export default {
+	Session,
+	Browser
 }

@@ -1,5 +1,5 @@
-const decode = require('jwt-decode');
-const Stores = require('./stores');
+import decode from 'jwt-decode';
+import Stores from './stores';
 
 /**
  * Standardkonfig
@@ -17,7 +17,7 @@ const localConfig = {
  * User Model
  * @public
  */
-const User = {
+export const User = {
     jwt: undefined,
     online: true,
     data: null,
@@ -57,7 +57,7 @@ function getStore(sessionOnly) {
  * @return {void}
  * @public
  */
-function setJWTKey(key) {
+export function setJWTKey(key) {
     localConfig.keys.jwt = key;
 }
 
@@ -68,7 +68,7 @@ function setJWTKey(key) {
  * @return {void}
  * @public
  */
-function setUserKey(key) {
+export function setUserKey(key) {
     localConfig.keys.user = key;
 }
 
@@ -77,7 +77,7 @@ function setUserKey(key) {
  * @return {void}
  * @public
 */
-function persist(sessionOnly = localConfig.sessionOnly) {
+export function persist(sessionOnly = localConfig.sessionOnly) {
     const Store = getStore(sessionOnly);
     User.jwt && Store.set(localConfig.keys.jwt, User.jwt);
     User.data && Store.set(localConfig.keys.user, User.data);
@@ -89,7 +89,7 @@ function persist(sessionOnly = localConfig.sessionOnly) {
  * @return {void}
  * @public
  */
-function load() {
+export function load() {
     const { Session } = Stores;
     const { jwt, user } = localConfig.keys;
 
@@ -106,7 +106,7 @@ function load() {
  * @return {bool}
  * @public
  */
-function isLoggedIn() {
+export function isLoggedIn() {
     if(User.jwt) {
         try {
             const now = new Date();
@@ -124,7 +124,7 @@ function isLoggedIn() {
  * @return {bool}
  * @public
  **/
-function isPasswordAuthenticated() {
+export function isPasswordAuthenticated() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.pwd || false;
@@ -138,7 +138,7 @@ function isPasswordAuthenticated() {
  * @return {bool}
  * @public
  */
-function isPhx() {
+export function isPhx() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.roles && data.roles.includes('phoenixmitarbeiter');
@@ -152,7 +152,7 @@ function isPhx() {
  * @return {bool}
  * @public
  */
-function isAdmin() {
+export function isAdmin() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.roles && data.roles.includes('phoenixadmin');
@@ -165,7 +165,7 @@ function isAdmin() {
  * @return {bool}
  * @public
  */
-function isAgency() {
+export function isAgency() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.kind && data.kind === 'Agentur';
@@ -179,7 +179,7 @@ function isAgency() {
  * @return {bool}
  * @public
  */
-function isServiceProvider() {
+export function isServiceProvider() {
     if(User.jwt) {
         const data = decode(User.jwt);
         return data.anbieter
@@ -195,7 +195,7 @@ function isServiceProvider() {
  * @returns {string} kind
  * @public
  */
-function getType() {
+export function getType() {
     if(User.jwt) {
         return decode(User.jwt).kind || null;
     }
@@ -207,7 +207,7 @@ function getType() {
  * falls es sich um einen PHX-MA handelt.
  * @returns {string}s
  */
-function getPhxUsername() {
+export function getPhxUsername() {
     if(User.jwt && isPhx()) {
         return decode(User.jwt).sub || null;
     }
@@ -223,7 +223,7 @@ function getPhxUsername() {
  * @return {void}
  * @public
  */
-function login(jwt, data, sessionOnly = false) {
+export function login(jwt, data, sessionOnly = false) {
     try {
         decode(jwt); // Prüfung, ob valides JWT
         localConfig.sessionOnly = !!sessionOnly;
@@ -241,7 +241,7 @@ function login(jwt, data, sessionOnly = false) {
  * @return {void}
  * @public
  */
-function logout() {
+export function logout() {
     User.data = null;
     User.jwt = undefined;
 
@@ -250,6 +250,6 @@ function logout() {
     Store.remove(localConfig.keys.user);
 }
 
-//--- EXPORT -----
+//--- DEFAULT EXPORT -----
 
-module.exports = User;
+export default User;

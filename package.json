@@ -2,9 +2,13 @@
   "name": "@phoenixreisen/user",
   "version": "0.1.0",
   "description": "User Handler, der den typischen Umgang mit einem eingeloggten bzw. sich einloggenden Phoenix-User erleichtert.",
-  "main": "src/user.js",
+  "main": "dist/user.js",
+  "module": "src/user.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "compile": "npx babel ./src/ --out-dir ./dist/",
+    "pretest": "del-cli dist && npm run compile",
+    "prepublish": "npm test"
   },
   "repository": {
     "type": "git",
@@ -12,18 +16,25 @@
   },
   "author": "Phoenix Reisen <it@phoenixreisen.com>",
   "contributors": [
+    "Phoenix Reisen <it@phoenixreisen.com>",
     "Fabian Marcus <f.marcus@phoenixreisen.com>"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://design-system.phoenixreisen.net",
   "dependencies": {
     "jwt-decode": "^2.2.0",
     "store": "^2.0.12"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
+    "del-cli": "^3.0.0",
     "jasmine": "^3.5.0",
     "jasmine-local-storage": "^1.1.1",
     "jsdom-global": "^3.0.2",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "terser": "^4.5.1"
   }
 }
