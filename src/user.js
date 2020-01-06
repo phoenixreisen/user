@@ -125,7 +125,7 @@ export function isLoggedIn() {
  * @public
  **/
 export function isPasswordAuthenticated() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         const data = decode(User.jwt);
         return data.pwd || false;
     }
@@ -139,7 +139,7 @@ export function isPasswordAuthenticated() {
  * @public
  */
 export function isPhx() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         const data = decode(User.jwt);
         return data.roles && data.roles.includes('phoenixmitarbeiter');
     }
@@ -153,7 +153,7 @@ export function isPhx() {
  * @public
  */
 export function isAdmin() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         const data = decode(User.jwt);
         return data.roles && data.roles.includes('phoenixadmin');
     }
@@ -166,7 +166,7 @@ export function isAdmin() {
  * @public
  */
 export function isAgency() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         const data = decode(User.jwt);
         return data.kind && data.kind === 'Agentur';
     }
@@ -180,7 +180,7 @@ export function isAgency() {
  * @public
  */
 export function isServiceProvider() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         const data = decode(User.jwt);
         return data.anbieter
             && data.roles
@@ -196,7 +196,7 @@ export function isServiceProvider() {
  * @public
  */
 export function getType() {
-    if(User.jwt) {
+    if(isLoggedIn()) {
         return decode(User.jwt).kind || null;
     }
     return null;
@@ -208,7 +208,7 @@ export function getType() {
  * @returns {string}s
  */
 export function getPhxUsername() {
-    if(User.jwt && isPhx()) {
+    if(isLoggedIn() && isPhx()) {
         return decode(User.jwt).sub || null;
     }
     return null;

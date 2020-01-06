@@ -101,7 +101,10 @@ describe("User Handler", () => {
     });
 
     it("should be able to recognize a phoenix employee", () => {
-        User.jwt = jwt.sign({ roles: ['phoenixmitarbeiter','phoenixadmin'] }, 'shhhhh');
+        User.jwt = jwt.sign({
+            roles: ['phoenixmitarbeiter','phoenixadmin'],
+            exp: new Date(new Date().getTime() + 24*60*60*1000).getTime(),
+        }, 'shhhhh');
         expect(User.isPhx()).toBeTruthy();
         expect(User.isAdmin()).toBeTruthy();
 
