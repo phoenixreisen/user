@@ -99,6 +99,7 @@ export function load() {
     const Store = getStore();
     User.jwt = Store.get(jwt, null) || User.jwt;
     User.data = Store.get(user, null) || User.data;
+    return User;
 }
 
 /**
