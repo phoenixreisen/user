@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"target": "ES5",
+
+		"jsx": "react",
+		"jsxFactory": "m",
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+
+		"sourceMap": false,
+		"declaration": true,
+		"importHelpers": true,
+		"removeComments": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"preserveConstEnums": true,
+		"allowSyntheticDefaultImports": true,
+
+		"strict": true,
+		"allowJs": true,
+		"checkJs": false,
+		"noImplicitAny": false,
+		"noUnusedLocals": true,
+		"strictNullChecks": true,
+		"noUnusedParameters": true,
+	},
+	"include": [
+	  "src/**/*.ts",
+	  "src/**/*.tsx",
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

@@ -1,9 +1,9 @@
-import decode from 'jwt-decode';
+import {UserProps, JWTProps} from './user.d'
+import JwtDecode from 'jwt-decode';
 import Stores from './stores';
 
 /**
  * Standardkonfig
- * @private
  */
 const localConfig = {
     keys: {
@@ -15,9 +15,8 @@ const localConfig = {
 
 /**
  * User Model
- * @public
  */
-export const User = {
+export const User: UserProps = {
     jwt: undefined,
     online: true,
     data: null,
@@ -26,10 +25,13 @@ export const User = {
     getPhxUsername,
     setJWTKey,
     setUserKey,
+
     load,
+    persist,
+
     login,
     logout,
-    persist,
+
     isPhx,
     isAdmin,
     isAgency,
@@ -38,13 +40,12 @@ export const User = {
     isPasswordAuthenticated,
 }
 
-//--- FUNKTIONEN -----
+//--- Funktionen -----
 
 /**
- * @return {Store}
- * @private
+ * Gibt den gesetzten Store zurück.
  */
-function getStore(sessionOnly) {
+function getStore(sessionOnly: boolean = localConfig.sessionOnly): StoreJsAPI {
     return (sessionOnly || (typeof sessionOnly === 'undefined' && localConfig.sessionOnly))
         ? Stores.Session
         : Stores.Browser;
@@ -53,32 +54,24 @@ function getStore(sessionOnly) {
 /**
  * Setzt den Schlüsselnamen, unter dem das JWT
  * im Store gespeichert werden soll.
- * @param {string} key
- * @return {void}
- * @public
  */
-export function setJWTKey(key) {
+export function setJWTKey(key: string): void {
     localConfig.keys.jwt = key;
 }
 
 /**
  * Setzt den Schlüsselnamen, unter dem das Benutzerobjekt
  * im Store gespeichert werden soll.
- * @param {string}
- * @return {void}
- * @public
  */
-export function setUserKey(key) {
+export function setUserKey(key: string): void {
     localConfig.keys.user = key;
 }
 
 /**
  * Speichert das Benutzerobjekt sowie das JWT im Store.
- * @return {void}
- * @public
 */
-export function persist(sessionOnly = localConfig.sessionOnly) {
-    const Store = getStore(sessionOnly);
+export function persist(sessionOnly: boolean = localConfig.sessionOnly): void {
+    const Store: StoreJsAPI = getStore(sessionOnly);
     User.jwt && Store.set(localConfig.keys.jwt, User.jwt);
     User.data && Store.set(localConfig.keys.user, User.data);
 }
@@ -86,12 +79,10 @@ export function persist(sessionOnly = localConfig.sessionOnly) {
 /**
  * Lädt Benutzer und JWt aus dem Storage. Wird kein User gefunden,
  * werden Standardwerte gesetzt.
- * @return {void}
- * @public
  */
-export function load() {
-    const { Session } = Stores;
-    const { jwt, user } = localConfig.keys;
+export function load(): UserProps {
+    const {Session} = Stores;
+    const {jwt, user} = localConfig.keys;
 
     User.online = navigator.onLine;
     localConfig.sessionOnly = (Session.get(jwt, null) !== null);
@@ -104,14 +95,13 @@ export function load() {
 
 /**
  * Prüft, ob ein JWT gesetzt und dieses noch nicht abgelaufen ist.
- * @return {bool}
- * @public
  */
-export function isLoggedIn() {
+export function isLoggedIn(): boolean {
     if(User.jwt) {
         try {
             const now = new Date();
-            const exp = new Date(parseInt(decode(User.jwt).exp));
+            const data: JWTProps = JwtDecode(User.jwt || '');
+            const exp = new Date(parseInt(data.exp));
             return (exp >= now);
         } catch(e) {}
     }
@@ -122,12 +112,10 @@ export function isLoggedIn() {
  * Prüfen, ob sich der User bereits mit seinem Passwort
  * authentifiziert hat. Das JWT enthält dann einen
  * entsprechenden Eintrag.
- * @return {bool}
- * @public
  **/
-export function isPasswordAuthenticated() {
+export function isPasswordAuthenticated(): boolean {
     if(isLoggedIn()) {
-        const data = decode(User.jwt);
+        const data: JWTProps = JwtDecode(User.jwt || '');
         return data.pwd || false;
     }
     return false;
@@ -136,12 +124,10 @@ export function isPasswordAuthenticated() {
 /**
  * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Phoenix-Mitarbeiter handelt.
- * @return {bool}
- * @public
  */
-export function isPhx() {
+export function isPhx(): boolean {
     if(isLoggedIn()) {
-        const data = decode(User.jwt);
+        const data: JWTProps = JwtDecode(User.jwt || '');
         return data.roles && data.roles.includes('phoenixmitarbeiter');
     }
     return false;
@@ -150,12 +136,10 @@ export function isPhx() {
 /**
  * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Phoenix-Admin handelt.
- * @return {bool}
- * @public
  */
-export function isAdmin() {
+export function isAdmin(): boolean {
     if(isLoggedIn()) {
-        const data = decode(User.jwt);
+        const data: JWTProps = JwtDecode(User.jwt || '');
         return data.roles && data.roles.includes('phoenixadmin');
     }
     return false;
@@ -163,13 +147,11 @@ export function isAdmin() {
 
 /**
  * Prüft, ob es sich um eine Agentur handelt.
- * @return {bool}
- * @public
  */
-export function isAgency() {
+export function isAgency(): boolean {
     if(isLoggedIn()) {
-        const data = decode(User.jwt);
-        return data.kind && data.kind === 'Agentur';
+        const data: JWTProps = JwtDecode(User.jwt || '');
+        return data?.kind === 'Agentur';
     }
     return false;
 };
@@ -177,15 +159,11 @@ export function isAgency() {
 /**
  * Prüft anhand einer Rollenangabe im JWT,
  * ob es sich um einen Dienstleister an Bord handelt.
- * @return {bool}
- * @public
  */
-export function isServiceProvider() {
+export function isServiceProvider(): boolean {
     if(isLoggedIn()) {
-        const data = decode(User.jwt);
-        return data.anbieter
-            && data.roles
-            && data.roles.includes('phoenixbordpersonal');
+        const data: JWTProps = JwtDecode(User.jwt || '');
+        return !!data?.anbieter && data?.roles?.includes('phoenixbordpersonal');
     }
     return false;
 };
@@ -193,12 +171,10 @@ export function isServiceProvider() {
 /**
  * Gibt den Nutzertyp zurück,
  * der im JWT steht (Eigenschaft "kind")
- * @returns {string} kind
- * @public
  */
-export function getType() {
+export function getType(): string | null {
     if(isLoggedIn()) {
-        return decode(User.jwt).kind || null;
+        return (JwtDecode(User.jwt || '') as JWTProps).kind || null;
     }
     return null;
 }
@@ -206,11 +182,10 @@ export function getType() {
 /**
  * Holt die Benutzerkennung des MAs aus dem JWT,
  * falls es sich um einen PHX-MA handelt.
- * @returns {string}s
  */
-export function getPhxUsername() {
+export function getPhxUsername(): string | null {
     if(isLoggedIn() && isPhx()) {
-        return decode(User.jwt).sub || null;
+        return (JwtDecode(User.jwt || '') as JWTProps).sub || null;
     }
     return null;
 }
@@ -219,14 +194,10 @@ export function getPhxUsername() {
  * Hinterlegt die Credentials im Storage.
  * Authentifizierung muss aber in der jeweiligen
  * Anwendung implementiert werden.
- * @param {string} jwt
- * @param {object} data
- * @return {void}
- * @public
  */
-export function login(jwt, data, sessionOnly = false) {
+export function login(jwt: string, data: object, sessionOnly: boolean = false): void | Error {
     try {
-        decode(jwt); // Prüfung, ob valides JWT
+        JwtDecode(jwt); // Prüfung, ob valides JWT
         localConfig.sessionOnly = !!sessionOnly;
         User.data = data;
         User.jwt = jwt;
@@ -239,18 +210,14 @@ export function login(jwt, data, sessionOnly = false) {
 /**
  * Setzt die Benutzerdaten zurück
  * und löscht sie aus dem localStorage
- * @return {void}
- * @public
  */
-export function logout() {
-    User.data = null;
+export function logout(): void {
     User.jwt = undefined;
+    User.data = null;
 
-    const Store = getStore();
+    const Store: StoreJsAPI = getStore();
     Store.remove(localConfig.keys.jwt);
     Store.remove(localConfig.keys.user);
 }
-
-//--- DEFAULT EXPORT -----
 
 export default User;
