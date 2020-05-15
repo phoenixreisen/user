@@ -1,6 +1,42 @@
-import {UserProps, JWTProps} from './user.d'
 import JwtDecode from 'jwt-decode';
 import Stores from './stores';
+
+/**
+ * Props & Types
+ */
+export interface UserProps {
+    jwt: string | undefined,
+    data: object | null,
+    online: boolean,
+
+    setJWTKey: (key: string) => void,
+    setUserKey: (key: string) => void,
+    load: () => UserProps,
+    persist: () => void,
+    getType: () => string | null,
+    getPhxUsername: () => string | null,
+    isPhx: () => boolean,
+    isAdmin: () => boolean,
+    isAgency: () => boolean,
+    isLoggedIn: () => boolean,
+    isServiceProvider: () => boolean,
+    isPasswordAuthenticated: () => boolean,
+    logout: () => void,
+    login: (
+        jwt: string,
+        data: {[key:string]: string | number},
+        sessionOnly: boolean
+    ) => void,
+}
+
+export interface JWTProps {
+    pwd: boolean,
+    sub: string,
+    exp: string,
+    kind: string,
+    anbieter: string,
+    roles: Array<string>,
+}
 
 /**
  * Standardkonfig
@@ -25,13 +61,10 @@ export const User: UserProps = {
     getPhxUsername,
     setJWTKey,
     setUserKey,
-
     load,
     persist,
-
     login,
     logout,
-
     isPhx,
     isAdmin,
     isAgency,
