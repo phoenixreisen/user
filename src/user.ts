@@ -34,6 +34,7 @@ export interface JWTProps {
     sub: string,
     exp: string,
     kind: string,
+    email: string,
     anbieter: string,
     roles: Array<string>,
 }
