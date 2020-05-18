@@ -23,12 +23,12 @@
   "license": "MIT",
   "homepage": "https://design-system.phoenixreisen.net",
   "dependencies": {
+    "@types/jwt-decode": "^2.2.1",
+    "@types/store": "^2.0.2",
     "jwt-decode": "^2.2.0",
     "store": "^2.0.12"
   },
   "devDependencies": {
-    "@types/jwt-decode": "^2.2.1",
-    "@types/store": "^2.0.2",
     "del-cli": "^3.0.0",
     "jasmine": "^3.5.0",
     "jasmine-local-storage": "^1.1.1",
