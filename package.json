@@ -1,6 +1,6 @@
 {
   "name": "@phoenixreisen/user",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "User Handler, der den typischen Umgang mit einem eingeloggten bzw. sich einloggenden Phoenix-User erleichtert.",
   "main": "dist/user.js",
   "types": "dist/user.d.ts",
