@@ -14,6 +14,7 @@ export interface UserProps {
     load: () => UserProps,
     persist: () => void,
     getType: () => string | null,
+    getAgencyNr: () => number | null,
     getPhxUsername: () => string | null,
     isPhx: () => boolean,
     isAdmin: () => boolean,
@@ -59,6 +60,7 @@ export const User: UserProps = {
     data: null,
 
     getType,
+    getAgencyNr,
     getPhxUsername,
     setJWTKey,
     setUserKey,
@@ -220,6 +222,17 @@ export function getType(): string | null {
 export function getPhxUsername(): string | null {
     if(isLoggedIn() && isPhx()) {
         return (JwtDecode(User.jwt || '') as JWTProps).sub || null;
+    }
+    return null;
+}
+
+/**
+ * Holt die Agenturnummer aus dem JWT,
+ * sofern es sich um eine Agentur handelt.
+ */
+export function getAgencyNr(): number | null {
+    if(isLoggedIn() && isAgency()) {
+        return parseInt((JwtDecode(User.jwt || '') as JWTProps).sub) || null;
     }
     return null;
 }

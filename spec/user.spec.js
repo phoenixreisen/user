@@ -112,6 +112,17 @@ describe("User Handler", () => {
         expect(User.isPhx()).toBeFalsy();
         expect(User.isAdmin()).toBeFalsy();
     });
+
+    it("should be able to recognize an agency and get its number out of the JWT", () => {
+        User.jwt = jwt.sign({
+            exp: new Date(new Date().getTime() + 24*60*60*1000).getTime(),
+            kind: 'Agentur',
+            sub: '444440',
+        }, 'secret!');
+        expect(User.isPhx()).toBeFalsy();
+        expect(User.isAgency()).toBeTruthy();
+        expect(User.getAgencyNr()).toBe(444440);
+    });
 });
 
 describe("Storage", () => {
