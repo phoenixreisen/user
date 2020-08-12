@@ -29,13 +29,13 @@
     "store": "^2.0.12"
   },
   "devDependencies": {
-    "del-cli": "^3.0.0",
-    "jasmine": "^3.5.0",
+    "del-cli": "^3.0.1",
+    "jasmine": "^3.6.1",
     "jasmine-local-storage": "^1.1.1",
     "jsdom-global": "^3.0.2",
     "jsonwebtoken": "^8.5.1",
-    "terser": "^4.6.13",
-    "tslib": "^2.0.0",
-    "typescript": "^3.9.2"
+    "terser": "^5.0.0",
+    "tslib": "^2.0.1",
+    "typescript": "^3.9.7"
   }
 }
