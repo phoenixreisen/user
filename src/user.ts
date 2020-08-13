@@ -1,13 +1,17 @@
 import JwtDecode from 'jwt-decode';
 import Stores from './stores';
 
+type UserData = {
+    [key: string]: any,
+}
+
 /**
  * Props & Types
  */
 export interface UserProps {
-    jwt: string | undefined,
-    data: object | null,
     online: boolean,
+    data: UserData | null,
+    jwt: string | undefined,
 
     setJWTKey: (key: string) => void,
     setUserKey: (key: string) => void,
@@ -25,7 +29,7 @@ export interface UserProps {
     logout: () => void,
     login: (
         jwt: string,
-        data: {[key:string]: string | number},
+        data: UserData,
         sessionOnly: boolean
     ) => void,
 }
@@ -242,11 +246,11 @@ export function getAgencyNr(): number | null {
  * Authentifizierung muss aber in der jeweiligen
  * Anwendung implementiert werden.
  */
-export function login(jwt: string, data: object, sessionOnly: boolean = false): void | Error {
+export function login(jwt: string, data?: UserData, sessionOnly?: boolean): void | Error {
     try {
         JwtDecode(jwt); // Prüfung, ob valides JWT
         localConfig.sessionOnly = !!sessionOnly;
-        User.data = data;
+        User.data = data || null;
         User.jwt = jwt;
         User.persist();
     } catch(e) {
