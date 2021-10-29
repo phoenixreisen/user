@@ -131,7 +131,10 @@ export function isPasswordAuthenticated(): boolean {
 export function isPhx(): boolean {
     if(isLoggedIn()) {
         const data: JWTProps = JwtDecode(User.jwt || '');
-        return data.roles && data.roles.includes('phoenixmitarbeiter');
+        return data.roles && (
+            data.roles.includes('phoenixmitarbeiter') ||
+            data.roles.includes('phoenixbordpersonal')
+        );
     }
     return false;
 }
@@ -143,10 +146,7 @@ export function isPhx(): boolean {
 export function isAdmin(): boolean {
     if(isLoggedIn()) {
         const data: JWTProps = JwtDecode(User.jwt || '');
-        return data.roles && (
-            data.roles.includes('phoenixadmin') ||
-            data.roles.includes('phoenixbordpersonal')
-        );
+        return data.roles && data.roles.includes('phoenixadmin');
     }
     return false;
 }
