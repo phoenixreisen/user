@@ -1,48 +1,12 @@
+import { UserData, UserProps, JWTProps } from './types';
 import JwtDecode from 'jwt-decode';
 import Stores from './stores';
 
-type UserData = {
-    [key: string]: any,
-}
-
 /**
- * Props & Types
+ * Gattung von Anwendern
+ * JWT-"kind"-Werte
  */
-export interface UserProps {
-    online: boolean,
-    data: UserData | null,
-    jwt: string | undefined,
-
-    setJWTKey: (key: string) => void,
-    setUserKey: (key: string) => void,
-    load: () => UserProps,
-    persist: () => void,
-    getType: () => string | null,
-    getAgencyNr: () => number | null,
-    getPhxUsername: () => string | null,
-    isPhx: () => boolean,
-    isAdmin: () => boolean,
-    isAgency: () => boolean,
-    isLoggedIn: () => boolean,
-    isServiceProvider: () => boolean,
-    isPasswordAuthenticated: () => boolean,
-    logout: () => void,
-    login: (
-        jwt: string,
-        data: UserData,
-        sessionOnly: boolean
-    ) => void,
-}
-
-export interface JWTProps {
-    pwd: boolean,
-    sub: string,
-    exp: string,
-    kind: string,
-    email: string,
-    anbieter: string,
-    roles: Array<string>,
-}
+export { UserTypes } from './types';
 
 /**
  * Standardkonfig
@@ -180,7 +144,10 @@ export function isPhx(): boolean {
 export function isAdmin(): boolean {
     if(isLoggedIn()) {
         const data: JWTProps = JwtDecode(User.jwt || '');
-        return data.roles && data.roles.includes('phoenixadmin');
+        return data.roles && (
+            data.roles.includes('phoenixadmin') ||
+            data.roles.includes('phoenixbordpersonal')
+        );
     }
     return false;
 }
