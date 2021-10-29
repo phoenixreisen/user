@@ -3,10 +3,9 @@ import JwtDecode from 'jwt-decode';
 import Stores from './stores';
 
 /**
- * Gattung von Anwendern
- * JWT-"kind"-Werte
+ * Types
  */
-export { UserTypes } from './types';
+export { UserProps, UserData, UserTypes, JWTProps } from './types';
 
 /**
  * Standardkonfig
