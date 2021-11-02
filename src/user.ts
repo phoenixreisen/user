@@ -131,10 +131,7 @@ export function isPasswordAuthenticated(): boolean {
 export function isPhx(): boolean {
     if(isLoggedIn()) {
         const data: JWTProps = JwtDecode(User.jwt || '');
-        return data.roles && (
-            data.roles.includes('phoenixmitarbeiter') ||
-            data.roles.includes('phoenixbordpersonal')
-        );
+        return data.roles && data.roles.includes('phoenixmitarbeiter');
     }
     return false;
 }
