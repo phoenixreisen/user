@@ -1,11 +1,7 @@
+export { UserProps, UserData, UserTypes, JWTProps } from './types';
 import { UserData, UserProps, JWTProps } from './types';
 import JwtDecode from 'jwt-decode';
 import Stores from './stores';
-
-/**
- * Types
- */
-export { UserProps, UserData, UserTypes, JWTProps } from './types';
 
 /**
  * Standardkonfig
@@ -39,6 +35,7 @@ export const User: UserProps = {
     isAdmin,
     isAgency,
     isLoggedIn,
+    isInPrivileged,
     isServiceProvider,
     isPasswordAuthenticated,
 }
@@ -84,8 +81,8 @@ export function persist(sessionOnly: boolean = localConfig.sessionOnly): void {
  * werden Standardwerte gesetzt.
  */
 export function load(): UserProps {
-    const {Session} = Stores;
-    const {jwt, user} = localConfig.keys;
+    const { Session } = Stores;
+    const { jwt, user } = localConfig.keys;
 
     User.online = navigator.onLine;
     localConfig.sessionOnly = (Session.get(jwt, null) !== null);
@@ -103,7 +100,7 @@ export function isLoggedIn(): boolean {
     if(User.jwt) {
         try {
             const now = new Date();
-            const data: JWTProps = JwtDecode(User.jwt || '');
+            const data: JWTProps = JwtDecode(User.jwt);
             const exp = new Date(parseInt(data.exp));
             return (exp >= now);
         } catch(e) {}
@@ -117,8 +114,8 @@ export function isLoggedIn(): boolean {
  * entsprechenden Eintrag.
  **/
 export function isPasswordAuthenticated(): boolean {
-    if(isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt || '');
+    if(User.jwt && isLoggedIn()) {
+        const data: JWTProps = JwtDecode(User.jwt);
         return data.pwd || false;
     }
     return false;
@@ -129,8 +126,8 @@ export function isPasswordAuthenticated(): boolean {
  * ob es sich um einen Phoenix-Mitarbeiter handelt.
  */
 export function isPhx(): boolean {
-    if(isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt || '');
+    if(User.jwt && isLoggedIn()) {
+        const data: JWTProps = JwtDecode(User.jwt);
         return data.roles && data.roles.includes('phoenixmitarbeiter');
     }
     return false;
@@ -141,9 +138,26 @@ export function isPhx(): boolean {
  * ob es sich um einen Phoenix-Admin handelt.
  */
 export function isAdmin(): boolean {
-    if(isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt || '');
+    if(User.jwt && isLoggedIn()) {
+        const data: JWTProps = JwtDecode(User.jwt);
         return data.roles && data.roles.includes('phoenixadmin');
+    }
+    return false;
+}
+
+/**
+ * Zum setzen von Feature Flags.
+ * Prüft, ob der Benutzername im JWT im Array privilegierter Namen vorkommt.
+ */
+export function isInPrivileged(names: Array<string>): boolean {
+    if(User.jwt && isLoggedIn() && isPhx()) {
+        if(Array.isArray(names) && names?.length > 0) {
+            // Holt den Benutzernamen aus dem JWT
+            const name = getPhxUsername();
+            if(name) {
+                return names.includes(name);
+            }
+        }
     }
     return false;
 }
@@ -152,8 +166,8 @@ export function isAdmin(): boolean {
  * Prüft, ob es sich um eine Agentur handelt.
  */
 export function isAgency(): boolean {
-    if(isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt || '');
+    if(User.jwt && isLoggedIn()) {
+        const data: JWTProps = JwtDecode(User.jwt);
         return data?.kind === 'Agentur';
     }
     return false;
@@ -164,8 +178,8 @@ export function isAgency(): boolean {
  * ob es sich um einen Dienstleister an Bord handelt.
  */
 export function isServiceProvider(): boolean {
-    if(isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt || '');
+    if(User.jwt && isLoggedIn()) {
+        const data: JWTProps = JwtDecode(User.jwt);
         return !!data?.anbieter && data?.roles?.includes('phoenixbordpersonal');
     }
     return false;
@@ -176,8 +190,8 @@ export function isServiceProvider(): boolean {
  * der im JWT steht (Eigenschaft "kind")
  */
 export function getType(): string | null {
-    if(isLoggedIn()) {
-        return (JwtDecode(User.jwt || '') as JWTProps).kind || null;
+    if(User.jwt && isLoggedIn()) {
+        return (JwtDecode(User.jwt) as JWTProps).kind || null;
     }
     return null;
 }
@@ -187,8 +201,8 @@ export function getType(): string | null {
  * falls es sich um einen PHX-MA handelt.
  */
 export function getPhxUsername(): string | null {
-    if(isLoggedIn() && isPhx()) {
-        return (JwtDecode(User.jwt || '') as JWTProps).sub || null;
+    if(User.jwt && isLoggedIn() && isPhx()) {
+        return (JwtDecode(User.jwt) as JWTProps).sub || null;
     }
     return null;
 }
@@ -198,8 +212,8 @@ export function getPhxUsername(): string | null {
  * sofern es sich um eine Agentur handelt.
  */
 export function getAgencyNr(): number | null {
-    if(isLoggedIn() && isAgency()) {
-        return parseInt((JwtDecode(User.jwt || '') as JWTProps).sub) || null;
+    if(User.jwt && isLoggedIn() && isAgency()) {
+        return parseInt((JwtDecode(User.jwt) as JWTProps).sub) || null;
     }
     return null;
 }

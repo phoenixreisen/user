@@ -16,6 +16,8 @@ describe("User Handler", () => {
 
     const token = jwt.sign({
         pwd: true,
+        sub: 'fabian',
+        roles: ['phoenixmitarbeiter'],
         data: 'ICH BIN JON SNOW, KÖNIG DES NORDENS UND ICH HABE MEINE TANTE GEBUMST.',
         exp: new Date(new Date().getTime() + 24*60*60*1000).getTime(),
     }, 'shhhhh');
@@ -85,6 +87,14 @@ describe("User Handler", () => {
         // Sollte truthy sein.
         const isPasswordAuthenticated = User.isPasswordAuthenticated();
         expect(isPasswordAuthenticated).toBeTruthy();
+
+        // Prüft, ob der Benutzername im JWT im übergebenen Array vorkommt.
+        // Dient zum setzen von Feature Flags.
+        expect(User.isInPrivileged(['fabian'])).toBeTruthy();
+        expect(User.isInPrivileged(['blabla'])).toBeFalsy();
+        expect(User.isInPrivileged('fabian')).toBeFalsy();
+        expect(User.isInPrivileged([])).toBeFalsy();
+        expect(User.isInPrivileged()).toBeFalsy();
 
         // Logout => User sollte danach nicht
         // mehr im Storage zu finden sein.

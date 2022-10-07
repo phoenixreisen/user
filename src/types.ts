@@ -15,17 +15,22 @@ export interface UserProps {
 
     setJWTKey: (key: string) => void,
     setUserKey: (key: string) => void,
+    
     load: () => UserProps,
     persist: () => void,
+
     getType: () => string | null,
     getAgencyNr: () => number | null,
     getPhxUsername: () => string | null,
+    
     isPhx: () => boolean,
     isAdmin: () => boolean,
     isAgency: () => boolean,
     isLoggedIn: () => boolean,
     isServiceProvider: () => boolean,
     isPasswordAuthenticated: () => boolean,
+    isInPrivileged: (names: Array<string>) => boolean,
+    
     logout: () => void,
     login: (
         jwt: string,
