@@ -3,7 +3,6 @@ import engine from 'store/src/store-engine';
 import localStorage from 'store/storages/localStorage';
 import cookieStorage from 'store/storages/cookieStorage';
 import sessionStorage from 'store/storages/sessionStorage';
-import memoryStorage from 'store/storages/memoryStorage';
 
 import defaults from 'store/plugins/defaults';
 import expire from 'store/plugins/expire';
@@ -11,14 +10,11 @@ import update from 'store/plugins/update';
 
 const persistent = [
 	localStorage,
-	cookieStorage,
-	sessionStorage,
-	memoryStorage
+	cookieStorage
 ];
 
 const session = [
-	sessionStorage,
-	memoryStorage,
+	sessionStorage
 ];
 
 const plugins = [
