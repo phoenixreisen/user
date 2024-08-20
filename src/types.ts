@@ -15,6 +15,7 @@ export interface UserProps {
 
     setJWTKey: (key: string) => void,
     setUserKey: (key: string) => void,
+    setSessionOnly: (sessionOnly: boolean) => void,
     
     load: () => UserProps,
     persist: () => void,
@@ -22,29 +23,17 @@ export interface UserProps {
     getType: () => string | null,
     getAgencyNr: () => number | null,
     getPhxUsername: () => string | null,
+    hasRole: (role: string) => boolean,
     
     isPhx: () => boolean,
     isAdmin: () => boolean,
     isAgency: () => boolean,
     isLoggedIn: () => boolean,
+    isSessionOnly: () => boolean,
     isServiceProvider: () => boolean,
     isPasswordAuthenticated: () => boolean,
     isInPrivileged: (names: Array<string>) => boolean,
     
     logout: () => void,
-    login: (
-        jwt: string,
-        data: UserData,
-        sessionOnly: boolean
-    ) => void,
-}
-
-export interface JWTProps {
-    pwd: boolean,
-    sub: string,
-    exp: string,
-    kind: string,
-    email: string,
-    anbieter: string,
-    roles: Array<string>,
+    login: (jwt: string, data?: UserData) => void,
 }

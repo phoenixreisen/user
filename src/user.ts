@@ -1,7 +1,7 @@
-export { UserProps, UserData, UserTypes, JWTProps } from './types';
-import { UserData, UserProps, JWTProps } from './types';
-import JwtDecode from 'jwt-decode';
-import Stores from './stores';
+export type { UserProps, UserData, UserTypes } from './types';
+import type { UserData, UserProps } from './types';
+
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 /**
  * Standardkonfig
@@ -22,11 +22,13 @@ export const User: UserProps = {
     online: true,
     data: null,
 
+    hasRole,
     getType,
     getAgencyNr,
     getPhxUsername,
     setJWTKey,
     setUserKey,
+    setSessionOnly,
     load,
     persist,
     login,
@@ -35,6 +37,7 @@ export const User: UserProps = {
     isAdmin,
     isAgency,
     isLoggedIn,
+    isSessionOnly,
     isInPrivileged,
     isServiceProvider,
     isPasswordAuthenticated,
@@ -45,10 +48,10 @@ export const User: UserProps = {
 /**
  * Gibt den gesetzten Store zurück.
  */
-function getStore(sessionOnly: boolean = localConfig.sessionOnly): StoreJsAPI {
-    return (sessionOnly || (typeof sessionOnly === 'undefined' && localConfig.sessionOnly))
-        ? Stores.Session
-        : Stores.Browser;
+function getStore(): Storage {
+    return localConfig.sessionOnly
+        ? sessionStorage
+        : localStorage;
 }
 
 /**
@@ -68,12 +71,20 @@ export function setUserKey(key: string): void {
 }
 
 /**
+ * Setzt, ob die Daten nur für die 
+ * Browser Session gespeichert werden sollen.
+ */
+export function setSessionOnly(sessionOnly: boolean): void {
+    localConfig.sessionOnly = sessionOnly;
+}
+
+/**
  * Speichert das Benutzerobjekt sowie das JWT im Store.
 */
-export function persist(sessionOnly: boolean = localConfig.sessionOnly): void {
-    const Store: StoreJsAPI = getStore(sessionOnly);
-    User.jwt && Store.set(localConfig.keys.jwt, User.jwt);
-    User.data && Store.set(localConfig.keys.user, User.data);
+export function persist(): void {
+    const Store = getStore();
+    User.jwt && Store.setItem(localConfig.keys.jwt, User.jwt);
+    User.data && Store.setItem(localConfig.keys.user, JSON.stringify(User.data));
 }
 
 /**
@@ -81,15 +92,14 @@ export function persist(sessionOnly: boolean = localConfig.sessionOnly): void {
  * werden Standardwerte gesetzt.
  */
 export function load(): UserProps {
-    const { Session } = Stores;
     const { jwt, user } = localConfig.keys;
+    
+    const Store = getStore();
+    const data = Store.getItem(user);
 
     User.online = navigator.onLine;
-    localConfig.sessionOnly = (Session.get(jwt, null) !== null);
-
-    const Store = getStore();
-    User.jwt = Store.get(jwt, null) || User.jwt;
-    User.data = Store.get(user, null) || User.data;
+    User.jwt = Store.getItem(jwt) || User.jwt;
+    User.data = data ? JSON.parse(data) : User.data;
     return User;
 }
 
@@ -100,9 +110,11 @@ export function isLoggedIn(): boolean {
     if(User.jwt) {
         try {
             const now = new Date();
-            const data: JWTProps = JwtDecode(User.jwt);
-            const exp = new Date(parseInt(data.exp));
-            return (exp >= now);
+            const data = jwt.decode(User.jwt) as JwtPayload;
+            if(data?.exp) {
+                const exp = new Date(+data.exp);
+                return (exp >= now);
+            }
         } catch(e) {}
     }
     return false;
@@ -115,7 +127,7 @@ export function isLoggedIn(): boolean {
  **/
 export function isPasswordAuthenticated(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt);
+        const data = jwt.decode(User.jwt) as JwtPayload;
         return data.pwd || false;
     }
     return false;
@@ -127,8 +139,7 @@ export function isPasswordAuthenticated(): boolean {
  */
 export function isPhx(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt);
-        return data.roles && data.roles.includes('phoenixmitarbeiter');
+        return hasRole('phoenixmitarbeiter');
     }
     return false;
 }
@@ -139,8 +150,7 @@ export function isPhx(): boolean {
  */
 export function isAdmin(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt);
-        return data.roles && data.roles.includes('phoenixadmin');
+        return hasRole('phoenixadmin');
     }
     return false;
 }
@@ -167,7 +177,7 @@ export function isInPrivileged(names: Array<string>): boolean {
  */
 export function isAgency(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt);
+        const data = jwt.decode(User.jwt) as JwtPayload;
         return data?.kind === 'Agentur';
     }
     return false;
@@ -179,11 +189,18 @@ export function isAgency(): boolean {
  */
 export function isServiceProvider(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data: JWTProps = JwtDecode(User.jwt);
-        return !!data?.anbieter && data?.roles?.includes('phoenixbordpersonal');
+        const data = jwt.decode(User.jwt) as JwtPayload;
+        return !!data?.anbieter && hasRole('phoenixbordpersonal');
     }
     return false;
 };
+
+/**
+ * Gibt das sessionOnly-Flag zurück.
+ */
+export function isSessionOnly(): boolean {
+    return localConfig.sessionOnly;
+}
 
 /**
  * Gibt den Nutzertyp zurück,
@@ -191,7 +208,7 @@ export function isServiceProvider(): boolean {
  */
 export function getType(): string | null {
     if(User.jwt && isLoggedIn()) {
-        return (JwtDecode(User.jwt) as JWTProps).kind || null;
+        return (jwt.decode(User.jwt) as JwtPayload).kind || null;
     }
     return null;
 }
@@ -202,7 +219,7 @@ export function getType(): string | null {
  */
 export function getPhxUsername(): string | null {
     if(User.jwt && isLoggedIn() && isPhx()) {
-        return (JwtDecode(User.jwt) as JWTProps).sub || null;
+        return (jwt.decode(User.jwt) as JwtPayload).sub || null;
     }
     return null;
 }
@@ -213,9 +230,24 @@ export function getPhxUsername(): string | null {
  */
 export function getAgencyNr(): number | null {
     if(User.jwt && isLoggedIn() && isAgency()) {
-        return parseInt((JwtDecode(User.jwt) as JWTProps).sub) || null;
+        const data = jwt.decode(User.jwt) as JwtPayload;
+        if(data?.sub) {
+            return parseInt(data.sub) || null;
+        }
     }
     return null;
+}
+
+/**
+ * Prüft, ob der Benutzer eine bestimmte Rolle
+ * im JWT hinterlegt hat.
+ */
+export function hasRole(role: string): boolean {
+    if(User.jwt && isLoggedIn()) {
+        const data = jwt.decode(User.jwt) as JwtPayload;
+        return data.roles && data.roles.includes(role);
+    }
+    return false;
 }
 
 /**
@@ -223,12 +255,11 @@ export function getAgencyNr(): number | null {
  * Authentifizierung muss aber in der jeweiligen
  * Anwendung implementiert werden.
  */
-export function login(jwt: string, data?: UserData, sessionOnly?: boolean): void | Error {
+export function login(token: string, data?: UserData): void | Error {
     try {
-        JwtDecode(jwt); // Prüfung, ob valides JWT
-        localConfig.sessionOnly = !!sessionOnly;
+        jwt.decode(token); // Prüfung, ob valides JWT
         User.data = data || null;
-        User.jwt = jwt;
+        User.jwt = token;
         User.persist();
     } catch(e) {
         throw 'ungültiges JWT!';
@@ -243,9 +274,9 @@ export function logout(): void {
     User.jwt = undefined;
     User.data = null;
 
-    const Store: StoreJsAPI = getStore();
-    Store.remove(localConfig.keys.jwt);
-    Store.remove(localConfig.keys.user);
+    const Store = getStore();
+    Store.removeItem(localConfig.keys.jwt);
+    Store.removeItem(localConfig.keys.user);
 }
 
 export default User;
