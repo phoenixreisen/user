@@ -23,18 +23,16 @@
   "license": "MIT",
   "homepage": "https://design-system.phoenixreisen.net",
   "dependencies": {
-    "@types/jwt-decode": "^3.1.0",
-    "@types/store": "^2.0.2",
-    "jwt-decode": "^4.0.0",
-    "jsonwebtoken": "^9.0.0",
-    "store": "^2.0.12"
+    "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/jwt-decode": "^3.1.0",
     "del-cli": "^5.1.0",
     "jasmine": "^5.2.0",
     "jasmine-local-storage": "^1.1.1",
     "jsdom-global": "^3.0.2",
+    "jsonwebtoken": "^9.0.0",
     "terser": "^5.0.0",
     "tslib": "^2.0.1",
     "typescript": "^5.5.4"

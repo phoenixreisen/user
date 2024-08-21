@@ -1,7 +1,7 @@
 export type { UserProps, UserData, UserTypes } from './types';
-import type { UserData, UserProps } from './types';
+import type { PhxPayload, UserData, UserProps } from './types';
 
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * Standardkonfig
@@ -110,7 +110,7 @@ export function isLoggedIn(): boolean {
     if(User.jwt) {
         try {
             const now = new Date();
-            const data = jwt.decode(User.jwt) as JwtPayload;
+            const data = jwtDecode(User.jwt) as PhxPayload;
             if(data?.exp) {
                 const exp = new Date(+data.exp);
                 return (exp >= now);
@@ -127,7 +127,7 @@ export function isLoggedIn(): boolean {
  **/
 export function isPasswordAuthenticated(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data = jwt.decode(User.jwt) as JwtPayload;
+        const data = jwtDecode(User.jwt) as PhxPayload;
         return data.pwd || false;
     }
     return false;
@@ -177,7 +177,7 @@ export function isInPrivileged(names: Array<string>): boolean {
  */
 export function isAgency(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data = jwt.decode(User.jwt) as JwtPayload;
+        const data = jwtDecode(User.jwt) as PhxPayload;
         return data?.kind === 'Agentur';
     }
     return false;
@@ -189,7 +189,7 @@ export function isAgency(): boolean {
  */
 export function isServiceProvider(): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data = jwt.decode(User.jwt) as JwtPayload;
+        const data = jwtDecode(User.jwt) as PhxPayload;
         return !!data?.anbieter && hasRole('phoenixbordpersonal');
     }
     return false;
@@ -208,7 +208,7 @@ export function isSessionOnly(): boolean {
  */
 export function getType(): string | null {
     if(User.jwt && isLoggedIn()) {
-        return (jwt.decode(User.jwt) as JwtPayload).kind || null;
+        return (jwtDecode(User.jwt) as PhxPayload).kind || null;
     }
     return null;
 }
@@ -219,7 +219,7 @@ export function getType(): string | null {
  */
 export function getPhxUsername(): string | null {
     if(User.jwt && isLoggedIn() && isPhx()) {
-        return (jwt.decode(User.jwt) as JwtPayload).sub || null;
+        return (jwtDecode(User.jwt) as PhxPayload).sub || null;
     }
     return null;
 }
@@ -230,7 +230,7 @@ export function getPhxUsername(): string | null {
  */
 export function getAgencyNr(): number | null {
     if(User.jwt && isLoggedIn() && isAgency()) {
-        const data = jwt.decode(User.jwt) as JwtPayload;
+        const data = jwtDecode(User.jwt) as PhxPayload;
         if(data?.sub) {
             return parseInt(data.sub) || null;
         }
@@ -244,7 +244,7 @@ export function getAgencyNr(): number | null {
  */
 export function hasRole(role: string): boolean {
     if(User.jwt && isLoggedIn()) {
-        const data = jwt.decode(User.jwt) as JwtPayload;
+        const data = jwtDecode(User.jwt) as PhxPayload;
         return data.roles && data.roles.includes(role);
     }
     return false;
@@ -257,7 +257,7 @@ export function hasRole(role: string): boolean {
  */
 export function login(token: string, data?: UserData): void | Error {
     try {
-        jwt.decode(token); // Prüfung, ob valides JWT
+        jwtDecode(token); // Prüfung, ob valides JWT
         User.data = data || null;
         User.jwt = token;
         User.persist();

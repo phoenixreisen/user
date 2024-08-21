@@ -1,3 +1,5 @@
+import type { JwtPayload } from "jwt-decode";
+
 export type UserData = {
     [key: string]: any,
 }
@@ -36,4 +38,12 @@ export interface UserProps {
     
     logout: () => void,
     login: (jwt: string, data?: UserData) => void,
+}
+
+export interface PhxPayload extends JwtPayload {
+    pwd: boolean,
+    email: string,
+    kind: UserTypes,
+    anbieter: string,
+    roles: Array<string>,
 }
