@@ -83,7 +83,7 @@ export function setSessionOnly(sessionOnly: boolean): void {
 */
 export function persist(): void {
     const Store = getStore();
-    User.jwt && Store.setItem(localConfig.keys.jwt, User.jwt);
+    User.jwt && Store.setItem(localConfig.keys.jwt, JSON.stringify(User.jwt));
     User.data && Store.setItem(localConfig.keys.user, JSON.stringify(User.data));
 }
 
@@ -95,10 +95,11 @@ export function load(): UserProps {
     const { jwt, user } = localConfig.keys;
     
     const Store = getStore();
+    const token = Store.getItem(jwt);
     const data = Store.getItem(user);
 
     User.online = navigator.onLine;
-    User.jwt = Store.getItem(jwt) || User.jwt;
+    User.jwt = token ? JSON.parse(token) : User.jwt;
     User.data = data ? JSON.parse(data) : User.data;
     return User;
 }
