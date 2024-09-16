@@ -25,7 +25,7 @@ export interface UserProps {
     load: () => UserProps,
     persist: () => void,
 
-    getType: () => string | null,
+    getType: () => UserTypes | null,
     getAgencyNr: () => number | null,
     getPhxUsername: () => string | null,
 
