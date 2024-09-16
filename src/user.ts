@@ -1,7 +1,19 @@
-export type { UserProps, UserData, UserTypes } from './types';
-import type { PhxPayload, UserData, UserProps } from './types';
-
+import type { PhxPayload, UserData, UserProps, UserTypes } from './types';
 import { jwtDecode } from 'jwt-decode';
+
+/**
+ * Typen Export
+ * um sie aus diesem Modul
+ * heraus importieren zu können.
+ */
+export  {
+    type UserData,
+    type UserProps,
+    type UserTypes,
+    type PhxPayload,
+} from './types';
+
+//--- Konstanten & Variablen -----
 
 /**
  * Standardkonfig
@@ -207,7 +219,7 @@ export function isSessionOnly(): boolean {
  * Gibt den Nutzertyp zurück,
  * der im JWT steht (Eigenschaft "kind")
  */
-export function getType(): string | null {
+export function getType(): UserTypes | null {
     if(User.jwt && isLoggedIn()) {
         return (jwtDecode(User.jwt) as PhxPayload).kind || null;
     }

@@ -4,12 +4,15 @@ export type UserData = {
     [key: string]: any,
 }
 
-export const enum UserTypes {
-    'Mitarbeiter' = 'Mitarbeiter',
-    'Buchung' = 'Buchung',
-    'Agentur' = 'Agentur',
-}
+/**
+ * Im JWT hinterlegte Rollen
+ */
+export type UserTypes = 'Buchung' | 'Agentur' | 'Mitarbeiter';
 
+/**
+ * Das User-Objekt
+ * samt Funktionsreferenzen
+ */
 export interface UserProps {
     online: boolean,
     data: UserData | null,
@@ -25,6 +28,7 @@ export interface UserProps {
     getType: () => string | null,
     getAgencyNr: () => number | null,
     getPhxUsername: () => string | null,
+
     hasRole: (role: string) => boolean,
     
     isPhx: () => boolean,
@@ -40,6 +44,9 @@ export interface UserProps {
     login: (jwt: string, data?: UserData) => void,
 }
 
+/**
+ * Im Phoenix JWT hinterlegte Daten
+ */
 export interface PhxPayload extends JwtPayload {
     pwd: boolean,
     email: string,
