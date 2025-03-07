@@ -1,2 +1,2 @@
-require('jsdom-global');
-require('jasmine-local-storage');
+require("jsdom-global");
+require("jasmine-local-storage");
